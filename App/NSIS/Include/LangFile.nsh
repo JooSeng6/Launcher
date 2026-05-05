@@ -172,9 +172,9 @@ Copyright 2008-2026 Joost Verburg, Anders Kjersem
 
   !ifndef ${NAME}
     !define "${NAME}" "${VALUE}"
-    !ifdef LANGFILE_PRIV_INCLUDEISFALLBACK
-      !warning 'LangString "${NAME}" for language ${LANGFILE_IDNAME} is missing, using fallback from "${LANGFILE_PRIV_INCLUDEISFALLBACK}"'
-    !endif
+;    !ifdef LANGFILE_PRIV_INCLUDEISFALLBACK
+;      !warning 'LangString "${NAME}" for language ${LANGFILE_IDNAME} is missing, using fallback from "${LANGFILE_PRIV_INCLUDEISFALLBACK}"'
+;    !endif
   !endif
 
 !macroend
