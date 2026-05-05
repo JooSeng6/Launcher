@@ -197,10 +197,40 @@ ${SegmentInit}
 		${SetEnvironmentVariablesPath} PAL:LastPortableAppsBaseDir $LastPortableAppsBaseDirectory
 	${EndIf}
 
-	${SetPortableApps.comPath} Documents
-	${SetPortableApps.comPath} Pictures
-	${SetPortableApps.comPath} Music
-	${SetPortableApps.comPath} Videos
+; Not correct.
+;	${SetPortableApps.comPath} Documents
+;	${SetPortableApps.comPath} Pictures
+;	${SetPortableApps.comPath} Music
+;	${SetPortableApps.comPath} Videos
+	
+; Use back codes from v2.	
+	ReadEnvStr $0 PortableApps.comDocuments
+	${If} $0 == ""
+	${OrIfNot} ${FileExists} $0
+		StrCpy $0 $CurrentDrive\Documents
+	${EndIf}
+	${SetEnvironmentVariablesPath} PortableApps.comDocuments $0
+
+	ReadEnvStr $1 PortableApps.comPictures
+	${If} $1 == ""
+	${OrIfNot} ${FileExists} $1
+		StrCpy $1 $0\Pictures
+	${EndIf}
+	${SetEnvironmentVariablesPath} PortableApps.comPictures $1
+
+	ReadEnvStr $1 PortableApps.comMusic
+	${If} $1 == ""
+	${OrIfNot} ${FileExists} $1
+		StrCpy $1 $0\Music
+	${EndIf}
+	${SetEnvironmentVariablesPath} PortableApps.comMusic $1
+
+	ReadEnvStr $1 PortableApps.comVideos
+	${If} $1 == ""
+	${OrIfNot} ${FileExists} $1
+		StrCpy $1 $0\Videos
+	${EndIf}
+	${SetEnvironmentVariablesPath} PortableApps.comVideos $1
 
 	; Language variables are in the Language segment
 
