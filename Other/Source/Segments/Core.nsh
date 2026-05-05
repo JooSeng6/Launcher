@@ -53,50 +53,54 @@ ${Segment.onInit}
 !macroend
 
 ${SegmentInit}
-	; Copy the launcher INI file to $PLUGINSDIR so that it doesn't go splurk if
-	; the disk is pulled out and can clean up.
-	StrCpy $LauncherFile $EXEDIR\App\AppInfo\Launcher\$BaseName.ini
-	${If} ${FileExists} $LauncherFile
-		InitPluginsDir
-		CopyFiles /SILENT $LauncherFile $PLUGINSDIR\launcher.ini
-		StrCpy $LauncherFile $PLUGINSDIR\launcher.ini
-	${Else}
-		StrCpy $MissingFileOrPath $LauncherFile
-		MessageBox MB_OK|MB_ICONSTOP `$(LauncherFileNotFound)`
-		Quit
-	${EndIf}
+		; Copy the launcher INI file to $PLUGINSDIR so that it doesn't go splurk if
+		; the disk is pulled out and can clean up.
+		StrCpy $LauncherFile $EXEDIR\App\AppInfo\Launcher\$BaseName.ini
+		${If} ${FileExists} $LauncherFile
+				InitPluginsDir
+				CopyFiles /SILENT $LauncherFile $PLUGINSDIR\launcher.ini
+				StrCpy $LauncherFile $PLUGINSDIR\launcher.ini
+		${Else}
+				StrCpy $MissingFileOrPath $LauncherFile
+				MessageBox MB_OK|MB_ICONSTOP `$(LauncherFileNotFound)`
+				Quit
+		${EndIf}
 
-	; If there are command line arguments, we use
-	; [Launch]:ProgramExecutableWhenParameters if it exists, falling back to
-	; the normal [Launch]ProgramExecutable if it's not set or if there aren't
-	; arguments.
-	${GetParameters} $0
-	StrCpy $ProgramExecutable ""
+		; If there are command line arguments, we use
+		; [Launch]:ProgramExecutableWhenParameters if it exists, falling back to
+		; the normal [Launch]ProgramExecutable if it's not set or if there aren't
+		; arguments.
+		${GetParameters} $0
+		StrCpy $ProgramExecutable ""
 
-	${If} $Bits = 64
+		${If} $Bits = 64
+				${If} $0 != ""
+						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters64
+				${EndIf}
+				${If} $ProgramExecutable == ""
+						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable64
+				${EndIf}
+		${EndIf}
+		
+		${If} $ProgramExecutable != ""
+		${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
+				StrCpy $ProgramExecutable ""
+		${EndIf}
+
 		${If} $0 != ""
-			${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters64
+		${AndIf} $ProgramExecutable == ""
+				${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters
 		${EndIf}
+
 		${If} $ProgramExecutable == ""
-			${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable64
+				${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable
 		${EndIf}
-	${EndIf}
 
-	${If} $0 != ""
-	${AndIf} $ProgramExecutable == ""
-		${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters
-	${EndIf}
-
-	${If} $ProgramExecutable == ""
-		${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable
-	${EndIf}
-
-	${If} $ProgramExecutable == ""
-		; Launcher file missing or missing crucial details (what am I to launch?)
-		MessageBox MB_OK|MB_ICONSTOP `$EXEDIR\App\AppInfo\Launcher\$BaseName.ini is missing [Launch]:ProgramExecutable - what am I to launch?`
-		Quit
-	${EndIf}
-
+		${If} $ProgramExecutable == ""
+				; Launcher file missing or missing crucial details (what am I to launch?)
+				MessageBox MB_OK|MB_ICONSTOP `$EXEDIR\App\AppInfo\Launcher\$BaseName.ini is missing [Launch]:ProgramExecutable - what am I to launch?`
+				Quit
+		${EndIf}
 !macroend
 
 ${SegmentPreExecPrimary}
