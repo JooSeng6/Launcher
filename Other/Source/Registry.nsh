@@ -1,4 +1,4 @@
-!include ${NSISDIR}\Include\Registry.nsh
+!include `${NSISDIR}\Include\Registry.nsh`
 
 
 !undef registry::MoveKey

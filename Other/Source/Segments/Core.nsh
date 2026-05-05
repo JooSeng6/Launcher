@@ -2,6 +2,7 @@ ${SegmentFile}
 
 Var LauncherFile
 Var Bits
+Var PALBits
 
 ${Segment.onInit}
 	; These may be needed with RunAsAdmin so they can't go in Init.
@@ -45,8 +46,8 @@ ${Segment.onInit}
 		StrCpy $Bits 64
 	${EndIf}
 
-	${ReadLauncherConfigWithDefault} $0 Launch BitsVariable$Bits $Bits
-	${SetEnvironmentVariable} PAL:Bits $0
+	${ReadLauncherConfigWithDefault} $PALBits Launch BitsVariable$Bits $Bits
+	${SetEnvironmentVariable} PAL:Bits $PALBits
 
 	; Make the AppID available in launcher.ini
 	${SetEnvironmentVariable} PAL:AppID $AppID
