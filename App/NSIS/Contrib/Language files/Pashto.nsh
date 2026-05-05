@@ -13,10 +13,6 @@
   ${LangFileString} MUI_UNTEXT_WELCOME_INFO_TEXT ".نالګونې ته يوسي $(^NameDA) دا اسانګر به تاسې د$\r$\n$\r$\n.نه وي پرانيستل شوی $(^NameDA) د نالګاو د پېلولو نه مخکښې، ځان ډاډمن کړﺉ چې$\r$\n$\r$\n$_CLICK"
 !endif
 
-!ifdef MUI_WELCOMEPAGE | MUI_UNWELCOMEPAGE
-  ${LangFileString} MUI_BUTTONTEXT_FINISH "&پای"
-!endif
-
 !ifdef MUI_LICENSEPAGE
   ${LangFileString} MUI_TEXT_LICENSE_TITLE "منښتليک تړون"
   ${LangFileString} MUI_TEXT_LICENSE_SUBTITLE ".لګولو نه مخکښې منښتليک توکي وګورﺉ $(^NameDA) د"
@@ -42,7 +38,7 @@
   ${LangFileString} MUI_TEXT_COMPONENTS_SUBTITLE ".کومې ځانګړتياوې چې لګول غواړﺉ، خوښ يې کړﺉ $(^NameDA) د"
 !endif
 
-!ifdef MUI_UNCOMPONENETSPAGE
+!ifdef MUI_UNCOMPONENTSPAGE
   ${LangFileString} MUI_UNTEXT_COMPONENTS_TITLE "رغتوکي خوښ کړﺉ"
   ${LangFileString} MUI_UNTEXT_COMPONENTS_SUBTITLE ".کومې ځانګړتياوې چې نالګول غواړﺉ، خوښ يې کړﺉ $(^NameDA) د"
 !endif
@@ -101,6 +97,7 @@
   ${LangFileString} MUI_TEXT_FINISH_REBOOTLATER "وروسته زه پخپله بياپېلون کول غواړم"
   ${LangFileString} MUI_TEXT_FINISH_RUN "&پرانيستل $(^NameDA)"
   ${LangFileString} MUI_TEXT_FINISH_SHOWREADME "&ماولوله ښودل"
+  ${LangFileString} MUI_BUTTONTEXT_FINISH "&پای"
 !endif
 
 !ifdef MUI_STARTMENUPAGE
