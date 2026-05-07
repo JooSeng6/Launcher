@@ -1,7 +1,7 @@
 ${SegmentFile}
 
 ${SegmentPrePrimary}
-    ${If} $PALBits == 64
+    ${If} $PAL:Bits == 64
         SetRegView 64
         ${If} $UsesRegistry == true
             StrCpy $R0 1

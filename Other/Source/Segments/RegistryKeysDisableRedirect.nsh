@@ -1,7 +1,7 @@
 ${SegmentFile}
 
 ${SegmentPrePrimary}
-    ${If} $PALBits == 64
+    ${If} $PAL:Bits == 64
         SetRegView 64
         ${If} $UsesRegistry == true
             ${ForEachINIPair} RegistryKeysDisableRedirect $0 $1
@@ -45,7 +45,7 @@ ${SegmentPrePrimary}
 !macroend
 
 ${SegmentPostPrimary}
-    ${If} $PALBits == 64
+    ${If} $PAL:Bits == 64
         SetRegView 64
         ${If} $UsesRegistry == true
             ${ForEachINIPair} RegistryKeys $0 $1

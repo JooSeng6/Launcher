@@ -1,7 +1,7 @@
 ${SegmentFile}
 
 ${SegmentPostPrimary}
-    ${If} $PALBits == 64
+    ${If} $PAL:Bits == 64
         SetRegView 64
         ${If} $UsesRegistry == true
             ; RegistryCleanupIfEmptyDisableRedirect

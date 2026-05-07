@@ -3,30 +3,18 @@
 ; languages is done in this file).
 
 !tempfile LangAutoDetectFile
-
 !macro IncludeLang _LANG
-		!ifdef LANGFILE_IDNAME
-    		!undef LANGFILE_IDNAME
-    !endif
-    !define LANGFILE_IDNAME "${_LANG}"			;Added 2024.03.16)
-    
-		LoadLanguageFile "${NSISDIR}\Contrib\Language files\${_LANG}.nlf"
-		!insertmacro LANGFILE_INCLUDE_WITHDEFAULT Languages\${_LANG}.nsh Languages\English.nsh
-		!appendfile "${LangAutoDetectFile}" "${Case} ${LANG_${_LANG}}$\n"
+	LoadLanguageFile "${NSISDIR}\Contrib\Language files\${_LANG}.nlf"
+	!insertmacro LANGFILE_INCLUDE_WITHDEFAULT Languages\${_LANG}.nsh Languages\English.nsh
+	!appendfile "${LangAutoDetectFile}" "${Case} ${LANG_${_LANG}}$\n"
 !macroend
-
 !define IncludeLang "!insertmacro IncludeLang"
-
 ${IncludeLang} English
-${IncludeLang} EnglishGB
-${IncludeLang} Arabic
 ${IncludeLang} Armenian
 ${IncludeLang} Bulgarian
-${IncludeLang} Czech
 ${IncludeLang} Danish
 ${IncludeLang} Dutch
 ${IncludeLang} Estonian
-${IncludeLang} Farsi
 ${IncludeLang} Finnish
 ${IncludeLang} French
 ${IncludeLang} Galician
@@ -36,17 +24,11 @@ ${IncludeLang} Hungarian
 ${IncludeLang} Indonesian
 ${IncludeLang} Italian
 ${IncludeLang} Japanese
-${IncludeLang} Korean
-${IncludeLang} Latvian
-${IncludeLang} Lithuanian
-${IncludeLang} Norwegian
 ${IncludeLang} Polish
 ${IncludeLang} Portuguese
 ${IncludeLang} PortugueseBR
 ${IncludeLang} Romanian
-${IncludeLang} Russian
 ${IncludeLang} SimpChinese
-${IncludeLang} Slovak
 ${IncludeLang} Slovenian
 ${IncludeLang} Spanish
 ${IncludeLang} Sundanese
@@ -54,13 +36,12 @@ ${IncludeLang} Swedish
 ${IncludeLang} Thai
 ${IncludeLang} TradChinese
 ${IncludeLang} Turkish
-${IncludeLang} Ukrainian
 ${IncludeLang} Vietnamese
 
 ; Use the Case statements formed above.
 ; Used in Segments/Language.nsh
 !macro LanguageCases
-		!include "${LangAutoDetectFile}"
-		!delfile "${LangAutoDetectFile}"
-		!undef LangAutoDetectFile
+	!include "${LangAutoDetectFile}"
+	!delfile "${LangAutoDetectFile}"
+	!undef LangAutoDetectFile
 !macroend
