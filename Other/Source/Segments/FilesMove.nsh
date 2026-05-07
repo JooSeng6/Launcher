@@ -137,7 +137,7 @@ ${!getdebug}
 		${GetParent} $1 $4
 		${ReadRuntimeData} $2 FilesMove RemoveIfEmpty:$4
 		${If} $2 == true
-			${RMDirIfNotJunction} $4
+			RMDir $4
 		${EndIf}
 
 		; And move that backup of any local data from earlier if it exists.

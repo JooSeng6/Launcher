@@ -16,29 +16,32 @@ ${Segment.onInit}
 ${SegmentInit}
 	; Detect to see if the language code is coming from the PortableApps.com Platform.
 	ReadEnvStr $0 PortableApps.comLanguageCode
+	ReadEnvStr $1 PAL:_IgnoreLanguage
 	${If} $0 == ""
+	${OrIf} $1 == true
 		${DebugMsg} "PortableApps.com Platform language variables are missing."
 		StrCpy $9 pap-missing
+		${SetEnvironmentVariable} PAL:_IgnoreLanguage true
 	${EndIf}
 
-	; Set languages variables; fallback to U.S. English if not launched from the PortableApps.com Platform.
-	${SetEnvironmentVariableFromEnvironmentVariableWithDefault} PAL:LanguageCode  LanguageCode  en
-	${SetEnvironmentVariableFromEnvironmentVariableWithDefault} PAL:LanguageCode2 LocaleCode2   en
-	${SetEnvironmentVariableFromEnvironmentVariableWithDefault} PAL:LanguageCode3 LocaleCode3   eng
-	${SetEnvironmentVariableFromEnvironmentVariableWithDefault} PAL:LanguageGlibc Localeglibc   en_US
-	${SetEnvironmentVariableFromEnvironmentVariableWithDefault} PAL:LanguageLCID  LocaleID      1033
-	${SetEnvironmentVariableFromEnvironmentVariableWithDefault} PAL:LanguageNSIS  LocaleWinName LANG_ENGLISH
+	; Set the default values
+	${SetEnvironmentVariableDefault} PortableApps.comLanguageCode en
+	${SetEnvironmentVariableDefault} PortableApps.comLocaleCode2 en
+	${SetEnvironmentVariableDefault} PortableApps.comLocaleCode3 eng
+	${SetEnvironmentVariableDefault} PortableApps.comLocaleglibc en_US
+	${SetEnvironmentVariableDefault} PortableApps.comLocaleID 1033
+	${SetEnvironmentVariableDefault} PortableApps.comLocaleWinName LANG_ENGLISH
 
-	; LanguageName: added in Platform 2.0 Beta 5.
+	; LocaleName: added in Platform 2.0 Beta 5.
 	; It's a mixed-case variant of LocaleWinName minus the LANG_.
 	; If it's not set (1.6 - 2.0b4) it's worked out from that.
 	; There's then no need for a table to fix the case, all operations I can
 	; think of are case-insensitive.
-	ReadEnvStr $0 PAL:LanguageName
+	ReadEnvStr $0 PortableApps.comLocaleName
 	${If} $0 == ""
-		ReadEnvStr $0 PAL:LanguageNSIS
+		ReadEnvStr $0 PortableApps.comLocaleWinName
 		StrCpy $0 $0 "" 5 ; Chop off the LANG_
-		${SetEnvironmentVariable} PAL:LanguageName $0
+		${SetEnvironmentVariable} PortableApps.comLocaleName $0
 	${EndIf}
 
 	; Now we can consider what to do next: was this launched from the
@@ -51,26 +54,15 @@ ${SegmentInit}
 		; This code is taken largely from FileWrite segment as it shares the
 		; format and a lot of the method.
 		ClearErrors
-		${ReadLauncherConfig} $9 Language Save
-		${IfNot} ${Errors}
-		${AndIf} $9 == yes
-			StrCpy $1 $EXEDIR\Data\settings\$AppIDSettings.ini
-		${Else}
-			ClearErrors
-			${ReadLauncherConfig} $0 LanguageFile Type
-			${ReadLauncherConfig} $1 LanguageFile File
-			${ParseLocations} $1
-		${EndIf}
+		${ReadLauncherConfig} $0 LanguageFile Type
+		${ReadLauncherConfig} $1 LanguageFile File
+		${ParseLocations} $1
 		${IfNot} ${Errors}
 		${AndIf} ${FileExists} $1
 			; The custom language is read into $8
 			StrCpy $8 ""
-			${If} $9 == yes
-				${DebugMsg} "Reading saved language from $1, section `$AppIDSettings`, key `Language`, with ReadINIStr."
-				ReadINIStr $8 $1 $AppIDSettings Language
-			${ElseIf} $0 == ConfigRead
+			${If} $0 == ConfigRead
 				${ReadLauncherConfig} $2 LanguageFile Entry
-				${ParseLocations} $2
 				${IfNot} ${Errors}
 					${ReadLauncherConfig} $4 LanguageFile CaseSensitive
 					${If} ${FileExists} $1
@@ -90,8 +82,6 @@ ${SegmentInit}
 			${ElseIf} $0 == INI
 				${ReadLauncherConfig} $2 LanguageFile Section
 				${ReadLauncherConfig} $3 LanguageFile Key
-				${ParseLocations} $2
-				${ParseLocations} $3
 				${IfNot} ${Errors}
 					${DebugMsg} "Reading the language from $1, section `$2`, key `$3`, with ReadINIStr."
 					ReadINIStr $8 $1 $2 $3
@@ -100,8 +90,6 @@ ${SegmentInit}
 			${ElseIf} $0 == "XML attribute"
 				${ReadLauncherConfig} $2 LanguageFile XPath
 				${ReadLauncherConfig} $3 LanguageFile Attribute
-				${ParseLocations} $2
-				${ParseLocations} $3
 				${IfNot} ${Errors}
 					${If} ${FileExists} $1
 						${DebugMsg} "Reading the language from $1, XPath `$2`, Attribute `$3` with XMLReadAttrib."
@@ -111,7 +99,6 @@ ${SegmentInit}
 				${EndIf}
 			${ElseIf} $0 == "XML text"
 				${ReadLauncherConfig} $2 LanguageFile XPath
-				${ParseLocations} $2
 				${If} ${FileExists} $1
 					${DebugMsg} "Reading the language from $1, XPath `$2`, with XMLReadText."
 					${XMLReadText} $1 $2 $8
@@ -136,27 +123,12 @@ ${SegmentInit}
 				; closing quotation marks, or something similar.
 				ClearErrors
 				${ReadLauncherConfig} $0 LanguageFile TrimRight
-				${ParseLocations} $0
 				${IfNot} ${Errors}
 					; See if it ends with this string.
 					StrLen $1 $0
 					StrCpy $2 $8 "" -$1
 					${If} $2 == $0       ; yes, it does,
 						StrCpy $8 $8 -$1 ; so cut it off
-					${EndIf}
-				${EndIf}
-
-				; Also, see if we want to cut anything off at the left.
-				; This could potentially be useful for some types.
-				ClearErrors
-				${ReadLauncherConfig} $0 LanguageFile TrimLeft
-				${ParseLocations} $0
-				${IfNot} ${Errors}
-					; See if it ends with this string.
-					StrLen $1 $0
-					StrCpy $2 $8 $1
-					${If} $2 == $0         ; yes, it does,
-						StrCpy $8 $8 "" $1 ; so cut it off
 					${EndIf}
 				${EndIf}
 
@@ -173,7 +145,7 @@ ${SegmentInit}
 	ClearErrors
 	ReadEnvStr $8 PAL:LanguageCustom
 	${If} ${Errors}
-		; See topics/languages in the Manual for an explanation of this code
+		; See topics/langauges in the Manual for an explanation of this code
 		; and a diagram to illustrate how it works.
 		${ReadLauncherConfig} $0 Language Base
 		${If} $0 != ""
@@ -200,79 +172,6 @@ ${SegmentInit}
 					${SetEnvironmentVariable} PAL:LanguageCustom $1
 				${EndIf}
 			${EndIf}
-		${EndIf}
-	${EndIf}
-
-
-	; Write the language back, if desired; this is basically a copy-paste of the previous section.
-	ClearErrors
-	${ReadLauncherConfig} $9 Language Save
-	${IfNot} ${Errors}
-	${AndIf} $9 == yes
-		StrCpy $1 $EXEDIR\Data\settings\$AppIDSettings.ini
-		StrCpy $8 %PAL:LanguageCustom%
-	${Else}
-		ClearErrors
-		${ReadLauncherConfig} $0 LanguageFile Type
-		${ReadLauncherConfig} $1 LanguageFile File
-		${ReadLauncherConfig} $8 LanguageFile SaveAs
-		${ParseLocations} $1
-	${EndIf}
-	${ParseLocations} $8
-	${IfNot} ${Errors}
-		${If} $9 == yes
-			${DebugMsg} "Writing the language ($8) to $1, section `$AppIDSettings`, key `Language`."
-			WriteINIStr $1 $AppIDSettings Language $8
-		${ElseIf} $0 == ConfigRead
-			${ReadLauncherConfig} $2 LanguageFile Entry
-			${ParseLocations} $2
-			${IfNot} ${Errors}
-				${ReadLauncherConfig} $4 LanguageFile CaseSensitive
-				${If} $4 == true
-					${DebugMsg} "Writing the language ($8) to $1, entry `$2`, with ConfigWriteS."
-					${ConfigWriteS} $1 $2 $8 $R9
-				${ElseIf} $4 != false
-					${DebugMsg} "Writing the language ($8) to $1, entry `$2`, with ConfigWrite."
-					${ConfigWrite} $1 $2 $8 $R9
-				${ElseIfNot} ${Errors}
-					${InvalidValueError} [LanguageFile]:CaseSensitive $4
-				${EndIf}
-			${EndIf}
-		${ElseIf} $0 == INI
-			${ReadLauncherConfig} $2 LanguageFile Section
-			${ReadLauncherConfig} $3 LanguageFile Key
-			${ParseLocations} $2
-			${ParseLocations} $3
-			${IfNot} ${Errors}
-				${DebugMsg} "Writing the language ($8) to $1, section `$2`, key `$3`, with WriteINIStr."
-				WriteINIStr $1 $2 $3 $8
-			${EndIf}
-!ifdef XML_ENABLED
-		${ElseIf} $0 == "XML attribute"
-			${ReadLauncherConfig} $2 LanguageFile XPath
-			${ReadLauncherConfig} $3 LanguageFile Attribute
-			${ParseLocations} $2
-			${ParseLocations} $3
-			${IfNot} ${Errors}
-				${DebugMsg} "Writing the language ($8) to $1, XPath `$2`, Attribute `$3` with XMLWriteAttrib."
-				${XMLWriteAttrib} $1 $2 $3 $8
-;				${IfThen} ${Errors} ${|} ${DebugMsg} "XMLWriteAttrib XPath error" ${|}
-			${EndIf}
-		${ElseIf} $0 == "XML text"
-			${ReadLauncherConfig} $2 LanguageFile XPath
-			${ParseLocations} $2
-			${IfNot} ${Errors}
-				${DebugMsg} "Writing the language to $1, XPath `$2`, with XMLWriteText."
-				${XMLWriteText} $1 $2 $8
-;				${IfThen} ${Errors} ${|} ${DebugMsg} "XMLReadText XPath error" ${|}
-			${EndIf}
-!else
-		${ElseIf} $0 == "XML attribute"
-		${OrIf} $0 == "XML text"
-			!insertmacro XML_WarnNotActivated [LanguageFile]
-!endif
-		${Else}
-			${InvalidValueError} [LanguageFile]:Type $0
 		${EndIf}
 	${EndIf}
 !macroend

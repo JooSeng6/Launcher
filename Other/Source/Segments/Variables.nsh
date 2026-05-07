@@ -92,26 +92,6 @@ ${SegmentFile}
 !macroend
 !define SetEnvironmentVariablesPathFromEnvironmentVariable "!insertmacro SetEnvironmentVariablesPathFromEnvironmentVariable"
 
-!macro SetEnvironmentVariableFromEnvironmentVariableWithDefault _VARIABLE_NAME _ENVIRONMENT_VARIABLE _DEFAULT
-	Push $R0
-	ReadEnvStr $R0 "${_ENVIRONMENT_VARIABLE}"
-	${IfThen} $R0 == "" ${|} StrCpy $R0 "${_DEFAULT}" ${|}
-	${SetEnvironmentVariable} "${_VARIABLE_NAME}" $R0
-	Pop $R0
-!macroend
-!define SetEnvironmentVariableFromEnvironmentVariableWithDefault "!insertmacro SetEnvironmentVariableFromEnvironmentVariableWithDefault"
-
-!macro GetParentUNC path out ;{{{2
-	; A variant of GetParent which deals appropriately with UNC paths, stopping
-	; at the share level. While GetParent would turn \\server\share into
-	; \\server, this leaves it as \\server\share.
-	${GetRoot} `${path}` `${out}`
-	${If} `${path}` != `${out}`
-		${GetParent} `${path}` `${out}`
-	${EndIf}
-!macroend
-!define GetParentUNC '!insertmacro GetParentUNC'
-
 !macro ParseLocations VAR ;{{{2
 	; Expands environment variables on a variable and provides a debug message
 	; about it.
@@ -133,49 +113,10 @@ ${SegmentFile}
 !macroend
 !define ParseLocations "!insertmacro ParseLocations"
 
-; !macro SetPortableApps.comPath {{{2
-!define SetPortableApps.comPath "!insertmacro SetPortableApps.comPathCall"
-!macro SetPortableApps.comPathCall _ID
-	Push "${_ID}"
-	${CallArtificialFunction} SetPortableApps.comPath_
-!macroend
-
-!macro SetPortableApps.comPath_
-	; Set the PortableApps.com<ID> environment variable to an existing path based
-	; on the following algorithm:
-	;   - %PortableApps.com<ID>%
-	;   - $EXEDIR\..\..\<ID>
-	;   - %PAL:Drive%\<ID>
-	;   - %PAL:Drive%
-
-	Exch $R1
-	Push $R0
-
-	ClearErrors
-	ReadEnvStr $R0 PortableApps.com$R1
-	${IfNot} ${Errors}
-	${AndIf} ${FileExists} $R0\*.*
-		Nop
-	${ElseIf} ${FileExists} $PortableAppsBaseDirectory\$R1
-		StrCpy $R0 $PortableAppsBaseDirectory\$R1
-	${ElseIf} ${FileExists} $CurrentDrive\$R1
-		StrCpy $R0 $CurrentDrive\$R1
-	${Else}
-		StrCpy $R0 $CurrentDrive
-	${EndIf}
-
-	${SetEnvironmentVariablesPath} PortableApps.com$R1 $R0
-	Pop $R0
-	Exch $R1
-!macroend
-
 ; Variables {{{1
 Var AppDirectory
 Var DataDirectory
 Var PortableAppsDirectory
-
-Var PortableAppsBaseDirectory
-Var LastPortableAppsBaseDirectory
 
 ; Segments {{{1
 ${SegmentInit}
@@ -186,24 +127,9 @@ ${SegmentInit}
 	${SetEnvironmentVariablesPath} PAL:DataDir $DataDirectory
 	; These may be changed in the RunLocally segment's Pre hook.
 
-	${GetParentUNC} $EXEDIR $PortableAppsDirectory
+	${GetParent} $EXEDIR $PortableAppsDirectory
 	${SetEnvironmentVariablesPath} PAL:PortableAppsDir $PortableAppsDirectory
 
-	${GetParentUNC} $PortableAppsDirectory $PortableAppsBaseDirectory
-	${SetEnvironmentVariablesPath} PAL:PortableAppsBaseDir $PortableAppsBaseDirectory
-	ClearErrors
-	ReadINIStr $LastPortableAppsBaseDirectory $DataDirectory\settings\$AppIDSettings.ini PortableApps.comLauncherLastRunEnvironment PAL:LastPortableAppsBaseDir
-	${IfNot} ${Errors}
-		${SetEnvironmentVariablesPath} PAL:LastPortableAppsBaseDir $LastPortableAppsBaseDirectory
-	${EndIf}
-
-; Not correct.
-;	${SetPortableApps.comPath} Documents
-;	${SetPortableApps.comPath} Pictures
-;	${SetPortableApps.comPath} Music
-;	${SetPortableApps.comPath} Videos
-	
-; Use back codes from v2.	
 	ReadEnvStr $0 PortableApps.comDocuments
 	${If} $0 == ""
 	${OrIfNot} ${FileExists} $0
@@ -242,8 +168,4 @@ ${SegmentInit}
 	${SetEnvironmentVariablesPath} LOCALAPPDATA $LOCALAPPDATA
 	${SetEnvironmentVariablesPath} APPDATA $APPDATA
 	${SetEnvironmentVariablesPath} DOCUMENTS $DOCUMENTS
-!macroend
-
-${SegmentPrePrimary}
-	WriteINIStr $DataDirectory\settings\$AppIDSettings.ini PortableApps.comLauncherLastRunEnvironment PAL:LastPortableAppsBaseDir $PortableAppsBaseDirectory
 !macroend
