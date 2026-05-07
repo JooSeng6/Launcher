@@ -2,14 +2,14 @@
 
 .. _ref-envsub:
 
-==================================
-Environment variable substitutions
-==================================
+================================
+Environment variable substitions
+================================
 
-This document covers environment variable substitution.
+This document covers environment variable substition.
 
 Many of the values in :ref:`launcher.ini <ref-launcher.ini>` are subject to
-environment variable substitutions. This works by taking the input string and
+environment variable substitions. This works by taking the input string and
 parsing environment variables, so that a chunk like ``%TEMP%`` will become
 something like ``C:\Users\user\AppData\Roaming\Temp``. To make this more useful
 in making applications portable, a number of extra environment variables are
@@ -32,7 +32,7 @@ These are a few variables for drive letter updating. In Live mode, these are the
 location of the portable device from which the application was run, *not* the
 application or data directory if :ini-key:`[LiveMode]:CopyApp` is set.
 
-Note that you cannot guarantee the case that this variable will be in. It may
+Note that you cannot guarrantee the case that this variable will be in. It may
 be lower or upper case.
 
 .. env:: PAL:Drive
@@ -63,11 +63,6 @@ with :ini-section:`[FileWriteN]` find and replace where the colon is not
 included in the path, e.g.  ``file:////%PAL:DriveLetter%/`` for ``file:////X/``
 or even ``%PAL:DriveLetter%\:/`` for ``X\:/``.
 
-If you wish your app to support UNC paths (see
-:ini-key:`[Launch]:SupportsUNC`), you should not use this. For UNC paths, this
-will be ``\`` (the first letter of the UNC path). Instead, you should figure
-out something probably in the custom code or `ask for help <help>`_.
-
 **Example:** ``X``
 
 .. env:: PAL:LastDriveLetter
@@ -79,8 +74,6 @@ The drive letter from which the portable app ran last. Useful with
 :ini-section:`[FileWriteN]` find and replace where the colon is not included in
 the path, e.g.  ``file:////%PAL:LastDriveLetter%/`` for ``file:////X/`` or even
 ``%PAL:LastDriveLetter%\:/`` for ``X\:/``.
-
-See above for comments on UNC paths.
 
 **Example:** ``W``
 
@@ -126,30 +119,6 @@ will be available:
 
 Now on to the environment variables themselves.
 
-.. env:: PAL:DrivePath
-
-PAL:DrivePath
--------------
-
-This is just the drive letter from which the portable app is running followed
-by a colon and a path separator.
-
-**Example:** ``X:\``
-
-.. versionadded:: 3.0
-
-.. env:: PAL:LastDrivePath
-
-PAL:LastDrivePath
------------------
-
-This is just the drive letter from which the portable app ran last followed
-by a colon and a path separator.
-
-**Example:** ``W:\``
-
-.. versionadded:: 3.0
-
 .. env:: PAL:AppDir
 
 PAL:AppDir
@@ -162,15 +131,6 @@ When Live mode is not enabled, this will be
 be ``%TEMP%\AppNamePortableLive\App`` unless :ini-key:`[LiveMode]:CopyApp` is
 set to ``false``.
 
-.. env:: PAL:LastAppDirectory
-
-PAL:LastAppDirectory
---------------------
-
-The value of :env:`PAL:AppDir` from when the app last ran.
-
-.. versionadded:: 3.0
-
 .. env:: PAL:DataDir
 
 PAL:DataDir
@@ -182,13 +142,6 @@ When Live mode is not enabled, this will be
 ``X:\PortableApps\AppNamePortable\Data`` and when Live mode is enabled it will
 be ``%TEMP%\AppNamePortableLive\Data``.
 
-.. env:: PAL:LastDataDirectory
-
-PAL:LastDataDirectory
----------------------
-
-The value of :env:`PAL:DataDir` from when the app last ran.
-
 .. env:: JAVA_HOME
 
 JAVA_HOME
@@ -199,107 +152,49 @@ including the "bin" directory or a filename like "javaw.exe". This will be the
 Java Portable directory, e.g.  ``X:\PortableApps\CommonFiles\Java``, or some
 local installation, e.g.  ``C:\Program Files\Java``.
 
-This variable is only available with ``appinfo.ini\[Dependencies]:UsesJava`` set
-to ``yes`` or ``optional``, but if it is ``optional``, the path it is set to may
-not exist (for ``yes`` the launcher will abort if Java is not found).
+This variable is only available with :ini-key:`[Activate]:Java` set to ``find``
+or ``require``, but if it is ``find``, the path it is set to may not exist (for
+``require`` the launcher will abort if Java is not found).
 
 .. env:: PortableApps.comDocuments
 
 PortableApps.comDocuments
 -------------------------
 
-The PortableApps.com Documents directory, normally ``X:\Documents``. There is
-no guarantee that this directory will exist.
-
-.. env:: PAL:LastPortableApps.comDocumentsDirectory
-
-PAL:LastPortableApps.comDocumentsDirectory
-------------------------------------------
-
-The value of :env:`PortableApps.comDocuments` from when the app last ran.
+The PortableApps.com Documents directory, normally ``X:\Documents``. There is no
+guarrantee that this directory will exist.
 
 .. env:: PortableApps.comPictures
 
 PortableApps.comPictures
 ------------------------
 
-The PortableApps.com Pictures directory, normally ``X:\Documents\Pictures``.
-There is no guarantee that this directory will exist.
-
-.. env:: PAL:LastPortableApps.comPicturesDirectory
-
-PAL:LastPortableApps.comPicturesDirectory
------------------------------------------
-
-The value of :env:`PortableApps.comPictures` from when the app last ran.
-
-.. versionadded:: 3.0
+The PortableApps.com Pictures directory, normally ``X:\Documents\Pictures``. There is no
+guarrantee that this directory will exist.
 
 .. env:: PortableApps.comMusic
 
 PortableApps.comMusic
 ---------------------
 
-The PortableApps.com Music directory, normally ``X:\Documents\Music``. There is
-no guarantee that this directory will exist.
-
-.. env:: PAL:LastPortableApps.comMusicDirectory
-
-PAL:LastPortableApps.comMusicDirectory
---------------------------------------
-
-The value of :env:`PortableApps.comMusic` from when the app last ran.
-
-.. versionadded:: 3.0
+The PortableApps.com Music directory, normally ``X:\Documents\Music``. There is no
+guarrantee that this directory will exist.
 
 .. env:: PortableApps.comVideos
 
 PortableApps.comVideos
 ----------------------
 
-The PortableApps.com Videos directory, normally ``X:\Documents\Videos``. There
-is no guarantee that this directory will exist.
-
-.. env:: PAL:LastPortableApps.comVideosDirectory
-
-PAL:LastPortableApps.comVideosDirectory
----------------------------------------
-
-The value of :env:`PortableApps.comVideos` from when the app last ran.
-
-.. versionadded:: 3.0
+The PortableApps.com Videos directory, normally ``X:\Documents\Videos``. There is no
+guarrantee that this directory will exist.
 
 .. env:: PAL:PortableAppsDir
 
 PAL:PortableAppsDir
 -------------------
 
-The PortableApps.com PortableApps directory, normally ``X:\PortableApps``. To
-be exact, this is the parent directory of the portable app package.
-
-.. env:: PAL:LastPortableAppsDirectory
-
-PAL:LastPortableAppsDirectory
------------------------------
-
-The value of :env:`PAL:PortableAppsDir` from when the app last ran.
-
-.. versionadded:: 3.0
-
-.. env:: PAL:PortableAppsBaseDir
-
-PAL:PortableAppsBaseDir
------------------------
-
-The base of the PortableApps.com directory hierachy, where
-``PAL:PortableAppsDir`` and ``PortableApps.comDocuments`` are usually at.
-
-.. env:: PAL:LastPortableAppsBaseDir
-
-PAL:LastPortableAppsBaseDir
----------------------------
-
-The value of ``PAL:PortableAppsBaseDir`` from the previous run.
+The PortableApps.com PortableApps directory, normally ``X:\PortableApps``. To be
+exact, this is the parent directory of the portable app package.
 
 .. env:: USERPROFILE
 
@@ -419,34 +314,34 @@ These variables are for language switching. Particularly of interest is
 
 A full table of all the values is available in :ref:`languages-values`.
 
-.. env:: PAL:LanguageCode
+.. env:: PortableApps.comLanguageCode
 
-* **PAL:LanguageCode** -- e.g. "en", "pt", "pt-br"
+* **PortableApps.comLanguageCode** -- e.g. "en", "pt", "pt-br"
 
-.. env:: PAL:LanguageCode2
+.. env:: PortableApps.comLocaleCode2
 
-* **PAL:LanguageCode2** -- e.g. "en", "pt", "pt"
+* **PortableApps.comLocaleCode2** -- e.g. "en", "pt", "pt"
 
-.. env:: PAL:LanguageCode3
+.. env:: PortableApps.comLocaleCode3
 
-* **PAL:LanguageCode3** -- e.g. "eng", "por", "por"
+* **PortableApps.comLocaleCode3** -- e.g. "eng", "por", "por"
 
-.. env:: PAL:LanguageGlibc
+.. env:: PortableApps.comLocaleglibc
 
-* **PAL:LanguageGlibc** -- e.g. "en_US", "pt", "pt_BR"
+* **PortableApps.comLocaleglibc** -- e.g. "en_US", "pt", "pt_BR"
 
-.. env:: PAL:LanguageLCID
+.. env:: PortableApps.comLocaleID
 
-* **PAL:LanguageLCID** -- e.g. "1033", "2070", "1046"
+* **PortableApps.comLocaleID** -- e.g. "1033", "2070", "1046"
 
-.. env:: PAL:LanguageNSIS
+.. env:: PortableApps.comLocaleWinName
 
-* **PAL:LanguageNSIS** -- e.g. "LANG_ENGLISH", "LANG_PORTUGUESE",
+* **PortableApps.comLocaleWinName** -- e.g. "LANG_ENGLISH", "LANG_PORTUGUESE",
   "LANG_PORTUGUESEBR"
 
-.. env:: PAL:LanguageName
+.. env:: PortableApps.comLocaleName
 
-* **PAL:LanguageName** -- e.g. "English", "Portuguese", "PortugueseBR"
+* **PortableApps.comLocaleName** -- e.g. "English", "Portuguese", "PortugueseBR"
   (note: these will be upper case until implemented in the PortableApps.com
   Platform)
 
@@ -454,31 +349,3 @@ A full table of all the values is available in :ref:`languages-values`.
 
 * **PAL:LanguageCustom** -- a custom variable constructed in the
   :ini-section:`[Language]` and :ini-section:`[LanguageStrings]` sections.
-
-.. _ref-envsub-misc:
-
-Miscellaneous variables
-=======================
-
-.. env:: PAL:AppID
-
-PAL:AppID
----------
-
-The portable app id, as defined in :ref:`appinfo.ini <paf-appinfo-appid>`.
-
-.. versionadded:: 3.0
-
-.. env:: PAL:Bits
-
-PAL:Bits
---------
-
-By default, on a 32-bit machine, this will be ``32`` and on a 64-bit machine,
-this will be ``64``. The most common usage for this is for app paths which can
-then be specified as ``%PAL:AppDir%\AppName%PAL:Bits%``.
-
-The value for this can be configured by :ini-key:`[Launch]:BitsVariable32` or
-:ini-key:`[Launch]:BitsVariable64`.
-
-.. versionadded:: 3.0

@@ -33,10 +33,11 @@ registry, with the value appended to it after a final slash, and the value is of
 the form REG\_\ *TYPE*:*value*; *REG_TYPE:* is optional, and defaults to
 ``REG_SZ`` (a string).
 
-The default value can be set by leaving the "value" part empty (so that the INI
-key will have a trailing slash).
+**Note:** if there is any possibility that the value does contain a colon,
+write the type explicitly.
 
-**Example:** ``HKCU\Software\AppName\Key\Value=REG_DWORD:16``
+**Examples:** ``HKCU\Software\AppName\Key\Value=REG_DWORD:16``,
+``HKCU\Software\AppName\Key\Value2=REG_SZ:%PAL:DataDir%``
 
 .. ini-section:: [RegistryCleanupIfEmpty]
 
@@ -88,34 +89,4 @@ but any value which may have been set while the portable application is running
 will be deleted. This can be useful for "dead" values which serve no purpose and
 so there is no point in saving them anywhere.
 
-The default value can be set by leaving the "value" part empty (so that the INI
-value will have a trailing slash).
-
 **Example:** ``1=HKCU\Software\Publisher\AppName\Value``
-
-.. ini-section:: [RegistryKeysDisableRedirect]
-
-[RegistryKeysDisableRedirect]
-=============================
-
-.. ini-section:: [RegistryValueWriteDisableRedirect]
-
-[RegistryValueWriteDisableRedirect]
-===================================
-
-.. ini-section:: [RegistryCleanupIfEmptyDisableRedirect]
-
-[RegistryCleanupIfEmptyDisableRedirect]
-=======================================
-
-.. ini-section:: [RegistryCleanupForceDisableRedirect]
-
-[RegistryCleanupForceDisableRedirect]
-=====================================
-
-.. ini-section:: [RegistryValueBackupDeleteDisableRedirect]
-
-[RegistryValueBackupDeleteDisableRedirect]
-==========================================
-
-These sections are identical to the ones above, with the exception of disabling redirection to Wow6432Node when running on an x64 system if desired.

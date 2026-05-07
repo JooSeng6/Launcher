@@ -48,7 +48,7 @@ master_doc = 'contents'
 
 # General information about the project.
 project = u'PortableApps.com Launcher'
-copyright = u'2010-2017, PortableApps.com'
+copyright = u'2010, Chris Morgan of PortableApps.com'
 
 # The version info for the project you're documenting, acts as replacement for
 # |version| and |release|, also used in various other places throughout the
@@ -102,7 +102,7 @@ pygments_style = 'sphinx'
 
 # The theme to use for HTML and HTML Help pages.  Major themes that come with
 # Sphinx are currently 'default' and 'sphinxdoc'.
-html_theme = 'classic'
+html_theme = 'default'
 
 # Theme options are theme-specific and customize the look and feel of a theme
 # further.  For a list of options available for each theme, see the
@@ -121,12 +121,12 @@ html_theme = 'classic'
 
 # The name of an image file (relative to this directory) to place at the top
 # of the sidebar.
-html_logo = '_static/Help_Logo_Top.png'
+html_logo = '_static/help_logo_top.png'
 
 # The name of an image file (within the static path) to use as favicon of the
 # docs.  This file should be a Windows icon file (.ico) being 16x16 or 32x32
 # pixels large.
-html_favicon = '_static/Favicon.ico'
+html_favicon = '_static/favicon.ico'
 
 # Add any paths that contain custom static files (such as style sheets) here,
 # relative to this directory. They are copied after the builtin static files,
@@ -188,7 +188,7 @@ rst_epilog = """
 # (source start file, target name, title, author, documentclass [howto/manual]).
 latex_documents = [
   ('index', 'PortableApps.comLauncher.tex', u'PortableApps.com Launcher Manual',
-   u'PortableApps.com', 'manual'),
+   u'Chris Morgan of PortableApps.com', 'manual'),
 ]
 
 # The name of an image file (relative to this directory) to place at the top of
