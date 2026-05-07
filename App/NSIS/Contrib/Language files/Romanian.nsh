@@ -5,7 +5,7 @@
 ;New revision by Vlad Rusu (vlad@bitattack.ro)
 ;	- Use Romanian letters ăâîşţ
 ;	- ".. produsului" removed as unnecessary
-;	- "Elimină" related terms replaced with more appropriate "Dezinstalează"
+;	- "Elimină" related terms replaced with more appropiate "Dezinstalează"
 ;	- Misc language tweaks
 
 !insertmacro LANGFILE "Romanian" = "Română" "Romana"
@@ -18,6 +18,10 @@
 !ifdef MUI_UNWELCOMEPAGE
   ${LangFileString} MUI_UNTEXT_WELCOME_INFO_TITLE "Bine aţi venit la dezinstalarea $(^NameDA)"
   ${LangFileString} MUI_UNTEXT_WELCOME_INFO_TEXT "Această aplicaţie va dezinstala $(^NameDA).$\r$\n$\r$\nEste recomandat să închideţi toate aplicaţiile înainte de începerea procesului de dezinstalare. Acest lucru vă poate asigura un proces de dezinstalare fără erori sau situaţii neprevăzute.$\r$\n$\r$\n$_CLICK"
+!endif
+
+!ifdef MUI_WELCOMEPAGE | MUI_UNWELCOMEPAGE
+  ${LangFileString} MUI_BUTTONTEXT_FINISH "&Terminare"
 !endif
 
 !ifdef MUI_LICENSEPAGE
@@ -104,7 +108,6 @@
   ${LangFileString} MUI_TEXT_FINISH_REBOOTLATER "Repornesc eu mai târziu"
   ${LangFileString} MUI_TEXT_FINISH_RUN "Executare $(^NameDA)"
   ${LangFileString} MUI_TEXT_FINISH_SHOWREADME "Afişare fişier readme (citeşte-mă)."
-  ${LangFileString} MUI_BUTTONTEXT_FINISH "&Terminare"
 !endif
 
 !ifdef MUI_STARTMENUPAGE
