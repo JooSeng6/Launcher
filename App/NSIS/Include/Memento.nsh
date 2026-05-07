@@ -85,13 +85,10 @@ A usage example can be found in `Examples\Memento.nsi`.
 ;
 ;   Usage is similar to Section.
 ;
-;     ${MementoSection} "name" "id"
-;
-;     ${MementoSectionEx} "[flags]" "name" "memento_id" "section_id"
+;     ${MementoSection} "name" "some_id"
 ;
 
 !define MementoSection "!insertmacro MementoSection"
-!define MementoSectionEx "!insertmacro MementoSectionEx"
 
 ;
 ; ${MementoSectionEnd}
@@ -100,7 +97,7 @@ A usage example can be found in `Examples\Memento.nsi`.
 ;
 ;   Usage is similar to SectionEnd.
 ;
-;     ${MementoSection} "name" "id"
+;     ${MementoSection} "name" "some_id"
 ;        # some code...
 ;     ${MementoSectionEnd}
 ;
@@ -113,7 +110,7 @@ A usage example can be found in `Examples\Memento.nsi`.
 ;
 ;   Usage is similar to Section with the /o switch.
 ;
-;     ${MementoUnselectedSection} "name" "id"
+;     ${MementoUnselectedSection} "name" "some_id"
 ;
 
 !define MementoUnselectedSection "!insertmacro MementoUnselectedSection"
@@ -125,7 +122,7 @@ A usage example can be found in `Examples\Memento.nsi`.
 ;
 ;   Usage is similar to SectionEnd.
 ;
-;     ${MementoSection} "name" "id"
+;     ${MementoSection} "name" "some_id"
 ;        # some code...
 ;     ${MementoSectionEnd}
 ;
@@ -186,34 +183,6 @@ A usage example can be found in `Examples\Memento.nsi`.
 
 !define MementoSectionSave "!insertmacro MementoSectionSave"
 
-;
-; MementoSection<ReadWrite><Int|Marker>
-;
-; Replaceable macros that allow custom storage methods to be used.
-;
-!define /IfNDef MementoSectionStorageSeparator '_'
-
-!ifmacrondef MementoSectionReadInt
-!define __MementoSectionStdRegReadWrite
-!define /IfNDef MementoSectionStoragePrefix "MementoSection"
-
-!macro MementoSectionReadInt outvar name
-ReadRegDWord ${outvar} ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSectionStoragePrefix}${name}`
-!macroend
-
-!macro MementoSectionWriteInt name val
-WriteRegDWord ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSectionStoragePrefix}${name}` `${val}`
-!macroend
-
-!macro MementoSectionReadMarker outvar name
-ReadRegStr ${outvar} ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSectionStoragePrefix}${name}`
-!macroend
-
-!macro MementoSectionWriteMarker name
-WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSectionStoragePrefix}${name}` ``
-!macroend
-
-!endif
 
 #####################################
 ### Internal Defines              ###
@@ -227,17 +196,15 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
 
 !macro __MementoCheckSettings
 
-  !ifdef __MementoSectionStdRegReadWrite
-    !ifndef MEMENTO_REGISTRY_ROOT | MEMENTO_REGISTRY_KEY
+  !ifndef MEMENTO_REGISTRY_ROOT | MEMENTO_REGISTRY_KEY
 
-      !error "MEMENTO_REGISTRY_ROOT and MEMENTO_REGISTRY_KEY must be defined before using any of Memento's macros"
+    !error "MEMENTO_REGISTRY_ROOT and MEMENTO_REGISTRY_KEY must be defined before using any of Memento's macros"
 
-    !endif
   !endif
 
 !macroend
 
-!macro __MementoSection flags name mementoid sectionid
+!macro __MementoSection flags name id
 
   !insertmacro __MementoCheckSettings
 
@@ -247,13 +214,11 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
 
   !endif
 
-  !define __MementoSectionLastMementoId `${mementoid}`
-  !define __MementoSectionLastSectionId `${sectionid}`
-  !define __MementoSectionLastFlags `${flags}`
+  !define __MementoSectionLastSectionId `${id}`
 
   !verbose pop
 
-  Section ${flags} `${name}` `${sectionid}`
+  Section ${flags} `${name}` `${id}`
 
   !verbose push
   !verbose 3
@@ -264,21 +229,12 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
 ### User Macros                   ###
 #####################################
 
-!macro MementoSectionEx flags name mid sid
-  
-  !verbose push 3
-
-  !insertmacro __MementoSection `${flags}` `${name}` `${mid}` `${sid}`
-
-  !verbose pop
-
-!macroend
-
 !macro MementoSection name id
 
-  !verbose push 3
+  !verbose push
+  !verbose 3
 
-  !insertmacro __MementoSection "" `${name}` `${id}` `${id}`
+  !insertmacro __MementoSection "" `${name}` `${id}`
 
   !verbose pop
 
@@ -286,9 +242,12 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
 
 !macro MementoUnselectedSection name id
 
-  !verbose push 3
+  !verbose push
+  !verbose 3
 
-  !insertmacro __MementoSection /o `${name}` `${id}` `${id}`
+  !insertmacro __MementoSection /o `${name}` `${id}`
+
+  !define __MementoSectionUnselected
 
   !verbose pop
 
@@ -315,7 +274,7 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
   Function __MementoSectionMarkNew${__MementoSectionIndex}
 
     ClearErrors
-    !insertmacro MementoSectionReadInt $0 `${MementoSectionStorageSeparator}${__MementoSectionLastMementoId}`
+    ReadRegDWORD $0 ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `MementoSection_${__MementoSectionLastSectionId}`
 
     ${If} ${Errors}
 
@@ -331,9 +290,7 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
   Function __MementoSectionRestoreStatus${__MementoSectionIndex}
 
     ClearErrors
-    !insertmacro MementoSectionReadInt $0 `${MementoSectionStorageSeparator}${__MementoSectionLastMementoId}`
-
-    !searchparse /ignorecase /noerrors `${__MementoSectionLastFlags}-` `/o` __MementoSectionUnselected
+    ReadRegDWORD $0 ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `MementoSection_${__MementoSectionLastSectionId}`
 
     !ifndef __MementoSectionUnselected
 
@@ -374,11 +331,11 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
 
     ${If} ${SectionIsSelected} `${${__MementoSectionLastSectionId}}`
 
-      !insertmacro MementoSectionWriteInt `${MementoSectionStorageSeparator}${__MementoSectionLastMementoId}` 1
+      WriteRegDWORD ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `MementoSection_${__MementoSectionLastSectionId}` 1
 
     ${Else}
 
-      !insertmacro MementoSectionWriteInt `${MementoSectionStorageSeparator}${__MementoSectionLastMementoId}` 0
+      WriteRegDWORD ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `MementoSection_${__MementoSectionLastSectionId}` 0
 
     ${EndIf}
 
@@ -391,9 +348,7 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
   !define __MementoSectionIndex ${__MementoSectionIndexNext}
   !undef __MementoSectionIndexNext
 
-  !undef __MementoSectionLastMementoId
   !undef __MementoSectionLastSectionId
-  !undef __MementoSectionLastFlags
 
   !verbose pop
 
@@ -436,7 +391,8 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
     # check for first usage
 
     ClearErrors
-    !insertmacro MementoSectionReadMarker $0 `Used`
+
+    ReadRegStr $0 ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` MementoSectionUsed
 
     ${If} ${Errors}
 
@@ -553,7 +509,7 @@ WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` `${MementoSection
 
   Push $0
 
-    !insertmacro MementoSectionWriteMarker `Used`
+    WriteRegStr ${MEMENTO_REGISTRY_ROOT} `${MEMENTO_REGISTRY_KEY}` MementoSectionUsed ""
   
     Call __MementoSectionSaveStatus1
 
