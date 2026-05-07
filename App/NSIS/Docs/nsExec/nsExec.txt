@@ -6,25 +6,19 @@ without opening a dos box.
 
 Usage
 -----
-nsExec::Exec [/MBCS] [/OEM] [/TIMEOUT=x] path
-Pop $0
+nsExec::Exec [/OEM] [/TIMEOUT=x] path
 
 -or-
 
-nsExec::ExecToLog [/MBCS] [/OEM] [/TIMEOUT=x] path
-Pop $0
+nsExec::ExecToLog [/OEM] [/TIMEOUT=x] path
 
 -or-
 
-nsExec::ExecToStack [/MBCS] [/OEM] [/TIMEOUT=x] path
-Pop $0 ; Return
-Pop $1 ; Output
+nsExec::ExecToStack [/OEM] [/TIMEOUT=x] path
 
 All functions are the same except ExecToLog will print the output
 to the log window and ExecToStack will push up to ${NSIS_MAX_STRLEN}
 characters of output onto the stack after the return value.
-
-Use the /MBCS switch to disable Unicode detection and always treat the text as ANSI.
 
 Use the /OEM switch to convert the output text from OEM to ANSI.
 

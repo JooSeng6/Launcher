@@ -76,7 +76,7 @@ Default values are:
 
 The old /TRANSLATE method still works for backward compatibility.
 
-/TRANSLATE downloading connecting second minute hour plural progress remaining
+/TRANSLATE downloading connecting second minute hour plural progress remianing
 
 Default values are:
 
