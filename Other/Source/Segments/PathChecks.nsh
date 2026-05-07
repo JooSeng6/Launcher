@@ -8,10 +8,9 @@ ${SegmentInit}
 	; warranty they don't have under the GPL.
 
 	; Fear not, $PROGRAMFILES64 == $PROGRAMFILES32 on a 32-bit machine
-	; And assume no sane person would install it *directly* on $PROGRAMFILES*
-	${If} $0 startswith "$PROGRAMFILES32\"
+	${If} $EXEDIR startswith $PROGRAMFILES32
 		StrCpy $0 $PROGRAMFILES32
-	${ElseIf} $0 startswith "$PROGRAMFILES64\"
+	${ElseIf} $EXEDIR startswith $PROGRAMFILES64
 		StrCpy $0 $PROGRAMFILES64
 	${Else}
 		StrCpy $0 ""
