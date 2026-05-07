@@ -12,7 +12,7 @@ NLF v6
 -
 # Translation v 1.0.0 by Ramon Flores <fa2ramon@usc.es>
 # ^Branding
-Nullsoft Install System %s
+Sistema de Instalación Nullsoft %s
 # ^SetupCaption
 Instalación de $(^Name)
 # ^UninstallCaption

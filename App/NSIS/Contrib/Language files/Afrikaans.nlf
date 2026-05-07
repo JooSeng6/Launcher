@@ -11,7 +11,7 @@ NLF v6
 -
 # Translation by Friedel Wolff
 # ^Branding
-Nullsoft Install System %s
+Nullsoft Installeerstelsel %s
 # ^SetupCaption
 $(^Name) Installasie
 # ^UninstallCaption
