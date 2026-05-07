@@ -13,7 +13,6 @@
   ;Name and file
   Name "Modern UI Test"
   OutFile "WelcomeFinish.exe"
-  Unicode True
 
   ;Default installation folder
   InstallDir "$LOCALAPPDATA\Modern UI Test"
