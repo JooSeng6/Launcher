@@ -1,27 +1,25 @@
-;Copyright (C) 2004-2017 PortableApps.com
-;Website: http://PortableApps.com/
+/* Copyright 2004-2010 PortableApps.com
+ * Website: http://portableapps.com/development
+ * Main developer and contact: Chris Morgan
+ *
+ * This software is OSI Certified Open Source Software.
+ * OSI Certified is a certification mark of the Open Source Initiative.
+ *
+ * This program is free software; you can redistribute it and/or
+ * modify it under the terms of the GNU General Public License
+ * as published by the Free Software Foundation; either version 2
+ * of the License, or (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program; if not, write to the Free Software
+ * Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
+ */
 
-;This software is OSI Certified Open Source Software.
-;OSI Certified is a certification mark of the Open Source Initiative.
-
-;This program is free software; you can redistribute it and/or
-;modify it under the terms of the GNU General Public License
-;as published by the Free Software Foundation; either version 2
-;of the License, or (at your option) any later version.
-
-;This program is distributed in the hope that it will be useful,
-;but WITHOUT ANY WARRANTY; without even the implied warranty of
-;MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
-;GNU General Public License for more details.
-
-;You should have received a copy of the GNU General Public License
-;along with this program; if not, write to the Free Software
-;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
-
-;=== For NSIS3
-Unicode true 
-ManifestDPIAware true 
- 
 !verbose 3
 
 !ifndef PACKAGE
@@ -58,17 +56,14 @@ ${!echo} "Including required files..."
 !include LangFile.nsh
 !include LogicLib.nsh
 !include FileFunc.nsh
-!include NewTextReplace.nsh
 !include TextFunc.nsh
 !include WordFunc.nsh
 
 ;(NSIS Plugins) {{{2
-!addincludedir Plugins
-!addplugindir  Plugins
+!include NewTextReplace.nsh
+!addplugindir Plugins
 
 ;(Custom) {{{2
-!addincludedir Include
-!include Debug.nsh
 !include ReplaceInFileWithTextReplace.nsh
 !include ForEachINIPair.nsh
 !include ForEachPath.nsh
@@ -77,8 +72,6 @@ ${!echo} "Including required files..."
 !include EmptyWorkingSet.nsh
 !include SetEnvironmentVariable.nsh
 !include CheckForPlatformSplashDisable.nsh
-!include LogicLibAdditions.nsh
-!include RMDirIfNotJunction.nsh
 
 ;=== Languages {{{1
 ${!echo} "Loading language strings..."
@@ -92,7 +85,6 @@ Var MissingFileOrPath
 Var AppNamePortable
 Var AppName
 Var ProgramExecutable
-Var StatusMutex
 Var WaitForProgram
 
 ; Macro: read a value from the launcher configuration file {{{1
@@ -147,6 +139,9 @@ Var WaitForProgram
 ${!echo} "Loading segments..."
 !include Segments.nsh
 
+;=== Debugging {{{1
+!include Debug.nsh
+
 ;=== Program Details {{{1
 ${!echo} "Specifying program details and setting options..."
 
@@ -168,7 +163,7 @@ VIAddVersionKey OriginalFilename "${AppID}.exe"
 
 !verbose 4
 
-Function .onInit           ;{{{1
+Function .onInit          ;{{{1
 	${RunSegment} Custom
 	${RunSegment} Core
 	${RunSegment} Temp
@@ -177,10 +172,9 @@ Function .onInit           ;{{{1
 	${RunSegment} RunAsAdmin
 FunctionEnd
 
-Function Init              ;{{{1
+Function Init             ;{{{1
 	${RunSegment} Custom
 	${RunSegment} Core
-	${RunSegment} PathChecks
 	${RunSegment} Settings
 	${RunSegment} DriveLetter
 	${RunSegment} DirectoryMoving
@@ -188,8 +182,6 @@ Function Init              ;{{{1
 	${RunSegment} Language
 	${RunSegment} Registry
 	${RunSegment} Java
-	${RunSegment} DotNet
-	${RunSegment} Ghostscript
 	${RunSegment} RunLocally
 	${RunSegment} Temp
 	${RunSegment} InstanceManagement
@@ -197,60 +189,51 @@ Function Init              ;{{{1
 	${RunSegment} RefreshShellIcons
 FunctionEnd
 
-Function Pre               ;{{{1
+Function Pre              ;{{{1
 	${RunSegment} Custom
 	${RunSegment} RunLocally
 	${RunSegment} Temp
-	${RunSegment} LastRunEnvironment
 	${RunSegment} Environment
 	${RunSegment} ExecString
 FunctionEnd
 
-Function PrePrimary        ;{{{1
+Function PrePrimary       ;{{{1
 	${RunSegment} Custom
-    ${RunSegment} Integrity
 	${RunSegment} DriveLetter
-	${RunSegment} Variables
 	${RunSegment} DirectoryMoving
-	${RunSegment} LastRunEnvironment
 	${RunSegment} FileWrite
 	${RunSegment} FilesMove
 	${RunSegment} DirectoriesMove
 	;${RunSegment} RegisterDLL
 	${RunSegment} RegistryKeys
-    ${RunSegment} RegistryKeysDisableRedirect
 	${RunSegment} RegistryValueBackupDelete
-    ${RunSegment} RegistryValueBackupDeleteDisableRedirect
 	${RunSegment} RegistryValueWrite
-    ${RunSegment} RegistryValueWriteDisableRedirect
 	${RunSegment} Services
 FunctionEnd
 
-Function PreSecondary      ;{{{1
+Function PreSecondary     ;{{{1
 	${RunSegment} Custom
 	;${RunSegment} *
 FunctionEnd
 
-Function PreExec           ;{{{1
+Function PreExec          ;{{{1
 	${RunSegment} Custom
 	${RunSegment} RefreshShellIcons
 	${RunSegment} WorkingDirectory
-	${RunSegment} RunBeforeAfter
 FunctionEnd
 
-Function PreExecPrimary    ;{{{1
+Function PreExecPrimary   ;{{{1
 	${RunSegment} Custom
 	${RunSegment} Core
-	${RunSegment} LastRunEnvironment
 	${RunSegment} SplashScreen
 FunctionEnd
 
-Function PreExecSecondary  ;{{{1
+Function PreExecSecondary ;{{{1
 	${RunSegment} Custom
 	;${RunSegment} *
 FunctionEnd
 
-Function Execute           ;{{{1
+Function Execute          ;{{{1
 	; Users can override this function in Custom.nsh
 	; like this (see Segments.nsh for the OverrideExecute define):
 	;
@@ -319,26 +302,10 @@ Function Execute           ;{{{1
 	!endif
 FunctionEnd
 
-Function PostExecPrimary   ;{{{1
-	${RunSegment} Custom
-FunctionEnd
-
-Function PostExecSecondary ;{{{1
-	${RunSegment} Custom
-FunctionEnd
-
-Function PostExec          ;{{{1
-	${RunSegment} RunBeforeAfter
-	${RunSegment} Custom
-FunctionEnd
-
-Function PostPrimary       ;{{{1
+Function PostPrimary      ;{{{1
 	${RunSegment} Services
-    ${RunSegment} RegistryValueBackupDeleteDisableRedirect
 	${RunSegment} RegistryValueBackupDelete
-    ${RunSegment} RegistryKeysDisableRedirect
 	${RunSegment} RegistryKeys
-    ${RunSegment} RegistryCleanupDisableRedirect
 	${RunSegment} RegistryCleanup
 	;${RunSegment} RegisterDLL
 	${RunSegment} Qt
@@ -350,18 +317,17 @@ Function PostPrimary       ;{{{1
 	${RunSegment} Custom
 FunctionEnd
 
-Function PostSecondary     ;{{{1
+Function PostSecondary    ;{{{1
 	;${RunSegment} *
 	${RunSegment} Custom
 FunctionEnd
 
-Function Post              ;{{{1
-	${RunSegment} Ghostscript
+Function Post             ;{{{1
 	${RunSegment} RefreshShellIcons
 	${RunSegment} Custom
 FunctionEnd
 
-Function Unload            ;{{{1
+Function Unload           ;{{{1
 	${RunSegment} XML
 	${RunSegment} Registry
 	${RunSegment} SplashScreen
@@ -387,36 +353,25 @@ FunctionEnd
 
 Section           ;{{{1
 	Call Init
-
-	System::Call 'Kernel32::OpenMutex(i1048576, b0, t"PortableApps.comLauncher$AppID-$BaseName::Starting") i.R0 ?e'
-	System::Call 'Kernel32::CloseHandle(iR0)'
-	Pop $R9
-	${If} $R9 <> 2
+	${ReadRuntimeData} $R9 PortableApps.comLauncher Status
+	${If} $R9 == starting
 		MessageBox MB_ICONSTOP $(LauncherAlreadyStarting)
 		Quit
-	${EndIf}
-	System::Call 'Kernel32::OpenMutex(i1048576, i0, t"PortableApps.comLauncher$AppID-$BaseName::Stopping") i.R0 ?e'
-	System::Call 'Kernel32::CloseHandle(iR0)'
-	Pop $R9
-	${If} $R9 <> 2
+	${ElseIf} $R9 == stopping
 		MessageBox MB_ICONSTOP $(LauncherAlreadyStopping)
 		Quit
 	${EndIf}
-
-	${IfNot} ${FileExists} $DataDirectory\PortableApps.comLauncherRuntimeData-$BaseName.ini
+	${If} $R9 != running
 	${OrIf} $SecondaryLaunch == true
 		${If} $SecondaryLaunch != true
-			System::Call 'Kernel32::CreateMutex(i0, i0, t"PortableApps.comLauncher$AppID-$BaseName::Starting") i.r0'
-			StrCpy $StatusMutex $0
+			${WriteRuntimeData} PortableApps.comLauncher Status starting
 		${EndIf}
 		${CallPS} Pre +
 		${CallPS} PreExec +
-		${If} $SecondaryLaunch != true
-			StrCpy $0 $StatusMutex
-			System::Call 'Kernel32::CloseHandle(ir0) ?e'
-			Pop $R9
+		${If} $WaitForProgram != false
+			${WriteRuntimeData} PortableApps.comLauncher Status running
 		${EndIf}
-		; File gets deleted in segment Core, hook Unload, so it'll only exist
+		; File gets deleted in segment Core, hook Unload, so it'll only be "running"
 		; in case of power-outage, disk removal while running or something like that.
 		Call Execute
 	${Else}
@@ -429,10 +384,10 @@ Section           ;{{{1
 		; One possible solution: ExecWait another copy of self to do cleanup
 	${EndIf}
 	${If} $SecondaryLaunch != true
-		System::Call 'Kernel32::CreateMutex(i0, i0, t"PortableApps.comLauncher$AppID-$BaseName::Stopping")'
+		; It would be left as "stopping" if secondary wrote it.
+		${WriteRuntimeData} PortableApps.comLauncher Status stopping
 	${EndIf}
 	${If} $WaitForProgram != false
-		${CallPS} PostExec -
 		${CallPS} Post -
 	${EndIf}
 	Call Unload

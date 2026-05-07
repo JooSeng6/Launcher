@@ -1,6 +1,6 @@
-﻿;Copyright (C) 2006-2017 John T. Haller
-;Copyright (C) 2006-2017 PortableApps.com
-;Website: http://PortableApps.com/
+﻿;Copyright (C) 2006-2009 John T. Haller
+
+;Website: http://PortableApps.com/Installer
 
 ;This software is OSI Certified Open Source Software.
 ;OSI Certified is a certification mark of the Open Source Initiative.
@@ -19,10 +19,6 @@
 ;along with this program; if not, write to the Free Software
 ;Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA  02110-1301, USA.
 
-;=== For NSIS3
-Unicode true
-ManifestDPIAware true
-
 !define CustomIconAndName
 
 ;=== Require at least Unicode NSIS 2.46
@@ -33,14 +29,14 @@ Name "PortableApps.com Launcher Generator"
 OutFile ..\..\PortableApps.comLauncherGenerator.exe
 Icon ..\..\App\AppInfo\appicon.ico
 Caption "PortableApps.com Launcher Generator"
-VIProductVersion 2.9.0.99
+VIProductVersion 1.0.0.0
 VIAddVersionKey ProductName "PortableApps.com Launcher Generator"
 VIAddVersionKey Comments "A compiler for custom PortableApps.com Launcher builds. For additional details, visit PortableApps.com"
 VIAddVersionKey CompanyName PortableApps.com
 VIAddVersionKey LegalCopyright PortableApps.com
 VIAddVersionKey FileDescription "PortableApps.com Launcher Generator"
-VIAddVersionKey FileVersion 2.9.0.99
-VIAddVersionKey ProductVersion 2.9.0.99
+VIAddVersionKey FileVersion 1.0.0.0
+VIAddVersionKey ProductVersion 1.0.0.0
 VIAddVersionKey InternalName "PortableApps.com Launcher Generator"
 VIAddVersionKey LegalTrademarks "PortableApps.com is a Trademark of Rare Ideas, LLC."
 VIAddVersionKey OriginalFilename PortableApps.comLauncherGenerator.exe
@@ -59,26 +55,23 @@ SetDatablockOptimize On
 !include FileFunc.nsh
 !include LogicLib.nsh
 !include MUI.nsh
-!include NewTextReplace.nsh
 
 ;(NSIS Plugins)
-!addincludedir Plugins
-!addplugindir  Plugins
+!include NewTextReplace.nsh
+!addplugindir Plugins
 
 ;(Custom)
-!include Include\ReplaceInFileWithTextReplace.nsh
+!include ReplaceInFileWithTextReplace.nsh
 
 ;=== Icon & Stye ===
 !define MUI_ICON "..\..\App\AppInfo\appicon.ico"
 !define MUI_HEADERIMAGE
-!define MUI_HEADERIMAGE_RIGHT
 !define MUI_HEADERIMAGE_BITMAP header.bmp
 
 BrandingText "PortableApps.com - Your Digital Life, Anywhere®"
 InstallButtonText "Go >" 
 ShowInstDetails show
 SubCaption 3 " | Generating Launcher"
-
 
 ;=== Variables
 Var FINISHTEXT
@@ -131,8 +124,11 @@ Function .onInit
 		StrCpy $PACKAGE $0$PACKAGE
 	${EndIf}
 
-	StrCpy $NSIS "$EXEDIR\App\NSIS\makensis.exe"
-
+	ReadINIStr $NSIS $EXEDIR\Data\settings.ini GeneratorWizard makensis
+	${If} $NSIS == ""
+		StrCpy $NSIS ..\NSISPortable\App\NSIS\makensis.exe
+		WriteINIStr $EXEDIR\Data\settings.ini GeneratorWizard makensis $NSIS
+	${EndIf}
 
 	${GetParameters} $R0
 	StrCmp $R0 "" PreFillForm
@@ -157,8 +153,8 @@ Function ShowWelcomeWindow
 FunctionEnd
 
 Function ShowOptionsWindow
-	!insertmacro MUI_HEADER_TEXT "PortableApps.com Launcher" "the open portable software standard"
 	${IfThen} $AUTOMATICCOMPILE == "true" ${|} Abort ${|}
+	!insertmacro MUI_HEADER_TEXT "PortableApps.com Launcher" "the open portable software standard"
 	InstallOptions::InitDialog /NOUNLOAD "$PLUGINSDIR\GeneratorWizardForm.ini"
     Pop $0
     InstallOptions::Show
@@ -185,6 +181,7 @@ FunctionEnd
 	FileWriteByte $9 "13"
 	FileWriteByte $9 "10"
 	FileClose $9
+	StrCpy $ERROROCCURED "true"
 !macroend
 
 !macro UpdatePath Source Target
@@ -196,45 +193,13 @@ FunctionEnd
 	${EndIf}
 !macroend
 
-Function UpdateLanguageEnvironmentVariables
-	Pop $9 # file
-
-	FileOpen $8 $9 r
-	FileReadWord $8 $7
-	FileClose $8
-
-	SetDetailsPrint none
-	${If} $7 = 0xFEFF
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLanguageCode  PAL:LanguageCode
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLocaleCode2   PAL:LanguageCode2
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLocaleCode3   PAL:LanguageCode3
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLocaleGlibc   PAL:LanguageGlibc
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLocaleWinName PAL:LanguageNSIS
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLocaleName    PAL:LanguageName
-		${ReplaceInFileUTF16LE} $9 PortableApps.comLocaleID      PAL:LanguageLCID
-	${Else}
-		${ReplaceInFile} $9 PortableApps.comLanguageCode  PAL:LanguageCode
-		${ReplaceInFile} $9 PortableApps.comLocaleCode2   PAL:LanguageCode2
-		${ReplaceInFile} $9 PortableApps.comLocaleCode3   PAL:LanguageCode3
-		${ReplaceInFile} $9 PortableApps.comLocaleGlibc   PAL:LanguageGlibc
-		${ReplaceInFile} $9 PortableApps.comLocaleWinName PAL:LanguageNSIS
-		${ReplaceInFile} $9 PortableApps.comLocaleName    PAL:LanguageName
-		${ReplaceInFile} $9 PortableApps.comLocaleID      PAL:LanguageLCID
-	${EndIf}
-	SetDetailsPrint lastused
-FunctionEnd
-
 Section Main
 	${IfNot} ${FileExists} $NSIS
 		StrCpy $ERROROCCURED true
 		${WriteErrorToLog} "NSIS not found at $NSIS."
-		MessageBox MB_ICONSTOP "NSIS was not found! (Looked for it in $NSIS)"
+		MessageBox MB_ICONSTOP "NSIS was not found! (Looked for it in $NSIS)$\r$\n$\r$\nYou can specify a custom path to makensis.exe in $EXEDIR\Data\settings.ini, [GeneratorWizard]:makensis"
 		Abort
 	${EndIf}
-
-	; Fix the package path, if necessary
-	StrCpy $R1 $PACKAGE 1 -1
-	${IfThen} $R1 == "\" ${|} StrCpy $PACKAGE $PACKAGE -1 ${|}
 
 	SetDetailsPrint ListOnly
 	DetailPrint "App: $PACKAGE"
@@ -242,10 +207,10 @@ Section Main
 	RealProgress::SetProgress /NOUNLOAD 0
 	RealProgress::GradualProgress /NOUNLOAD 1 20 90 "Processing complete."
 
-	; Check if any upgrade needs to be done from 2.0
+	; Check if any upgrade needs to be done from 2.0 to 2.1
 	${If}   ${FileExists} $PACKAGE\Other\Source\PortableApps.comLauncherCustom.nsh
 	${OrIf} ${FileExists} $PACKAGE\Other\Source\PortableApps.comLauncherDebug.nsh
-		DetailPrint "Upgrading from 2.0..."
+		DetailPrint "Upgrading from 2.0 to 2.1..."
 		!insertmacro UpdatePath Other\Source\PortableApps.comLauncherCustom.nsh App\AppInfo\Launcher\Custom.nsh
 		!insertmacro UpdatePath Other\Source\PortableApps.comLauncherDebug.nsh  App\AppInfo\Launcher\Debug.nsh
 
@@ -257,26 +222,14 @@ Section Main
 		; Avoid ${...} being taken amiss
 		StrCpy $0 $${ReadUser
 		${If} $1 = 0xFEFF
-			${ReplaceInFileUTF16LECS} $PACKAGE\App\AppInfo\Launcher\Custom.nsh $0OverrideConfig} $0Config}
-		${Else}
-			${ReplaceInFileCS} $PACKAGE\App\AppInfo\Launcher\Custom.nsh $0OverrideConfig} $0Config}
+			${If} $5 == UTF-16LE
+				${ReplaceInFileUTF16LECS} $PACKAGE\App\AppInfo\Launcher\Custom.nsh $0OverrideConfig} $0Config}
+			${Else}
+				${ReplaceInFileCS} $PACKAGE\App\AppInfo\Launcher\Custom.nsh $0OverrideConfig} $0Config}
+			${EndIf}
 		${EndIf}
 		DetailPrint " "
 	${EndIf}
-
-	; Check if any upgrade needs to be done from 2.1
-	DetailPrint "Upgrading from 2.1 if needed..."
-	; Replace the PortableApps.com language environment variables with their PAL counterparts
-	Push $PACKAGE\App\AppInfo\Launcher\Custom.nsh
-	Call UpdateLanguageEnvironmentVariables
-	FindFirst $0 $1 $PACKAGE\App\AppInfo\Launcher\*.ini
-	${DoUntil} $1 == ""
-		Push $PACKAGE\App\AppInfo\Launcher\$1
-		Call UpdateLanguageEnvironmentVariables
-		FindNext $0 $1
-	${Loop}
-	FindClose $0
-	DetailPrint " "
 
 
 	DetailPrint "Generating launcher..."
@@ -331,23 +284,19 @@ Section Main
 	${If} $ERROROCCURED != true
 		; Build the thing
 		ExecDos::exec `"$NSIS" /O"$EXEDIR\Data\PortableApps.comLauncherGeneratorLog.txt" /DPACKAGE="$PACKAGE" /DNamePortable="$Name" /DAppID="$AppID" /DVersion="$1"$2 "$EXEDIR\Other\Source\PortableApps.comLauncher.nsi"` "" ""
-		Pop $R1
-		${If} $R1 <> 0
-			StrCpy $ERROROCCURED true
-			${WriteErrorToLog} "MakeNSIS exited with status code $R1"
-		${EndIf}
 	${EndIf}
 
 	SetDetailsPrint ListOnly
 
 	DetailPrint " "
 	DetailPrint "Processing complete."
-	${If} $ERROROCCURED != true
+	${If} ${FileExists} $PACKAGE\$AppID.exe
 		StrCpy $FINISHTITLE "Launcher Created"
 		StrCpy $FINISHTEXT "The launcher has been created. Launcher location:\r\n$PACKAGE\r\n\r\nLauncher name:\r\n$AppID.exe" 
 	${Else}
 		StrCpy $FINISHTITLE "An Error Occured"
 		StrCpy $FINISHTEXT "The launcher was not created.  You can view the log file for more information."
+		StrCpy $ERROROCCURED true
 	${EndIf}
 SectionEnd
 
