@@ -35,8 +35,7 @@ strategic partnership between the developer and... and... well, whatever's left.
 Hooks
 -----
 
-Here is a list of the hooks which can be executed (in the order in which they
-are called):
+Here is a list of the hooks which can be executed:
 
 * ``.onInit``: things which must go in the NSIS ``.onInit`` function (see the
   `NSIS documentation`_ for details about ``.onInit``)
@@ -54,17 +53,13 @@ are called):
   do something here. Try to use the ``Pre`` hook instead.
 * ``PreExecPrimary``: ``PreExec`` for primary instances.
 * ``PreExecSecondary``: ``PreExec`` for secondary and subsequent instances.
-* ``PostExecPrimary``: ``PostExec`` for primary instances.
-* ``PostExecSecondary``: ``PostExec`` for secondary and subsequent instances.
-* ``PostExec``: just after the program gets executed, there's an opportunity to
-  do something here. Try to use the ``Post`` hook instead.
-* ``PostPrimary``: ``Post`` for primary instances.
-* ``PostSecondary``: ``Post`` for secondary and subsequent instances.
 * ``Post``: clean up the application and handle restoration of settings and
   related things in here.
+* ``PostPrimary``: ``Post`` for primary instances.
+* ``PostSecondary``: ``Post`` for secondary and subsequent instances.
 * ``Unload``: unload plug-ins and clean up traces from the launcher itself.
 
-.. _`NSIS documentation`: http://nsis.sourceforge.net/Docs/Chapter4.html#oninit
+.. _`NSIS documentation`: http://nsis.sourceforge.net/Docs/Chapter4.html#4.7.2.1.2
 
 .. _segments-disable:
 
@@ -104,16 +99,11 @@ Here is the current list of segments included in the PortableApps.com Launcher:
 * **Registry:** :ini-key:`[Activate]:Registry` and helper utilities for
   other Registry segments. See also :ref:`registry` for this and the
   other Registry segments listed here.
+* **RegistryCleanup:** :ini-section:`[RegistryCleanupIfEmpty]` and
+  :ini-section:`[RegistryCleanupForce]`
 * **RegistryKeys:** :ini-section:`[RegistryKeys]`
 * **RegistryValueBackupDelete:** :ini-section:`[RegistryValueBackupDelete]`
 * **RegistryValueWrite:** :ini-section:`[RegistryValueWrite]`
-* **RegistryCleanup:** :ini-section:`[RegistryCleanupIfEmpty]` and
-  :ini-section:`[RegistryCleanupForce]`
-* **RegistryKeysDisableRedirect:** :ini-section:`[RegistryKeysDisableRedirect]`
-* **RegistryValueBackupDeleteDisableRedirect:** :ini-section:`[RegistryValueBackupDeleteDisableRedirect]`
-* **RegistryValueWriteDisableRedirect:** :ini-section:`[RegistryValueWriteDisableRedirect]`
-* **RegistryCleanupDisableRedirect:** :ini-section:`[RegistryCleanupIfEmptyDisableRedirect]` and
-  :ini-section:`[RegistryCleanupForceDisableRedirect]`
 * **RunAsAdmin:** :ini-key:`[Launch]:RunAsAdmin` et al.
 * **RunLocally:** live mode support (mainly a user feature, but slightly
   configurable with :ini-section:`[LiveMode]`)

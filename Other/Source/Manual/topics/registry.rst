@@ -160,8 +160,7 @@ do about them.
 (Where ``X`` is a hexadecimal digit.)
 
 These are DLL servers and need registering. For the moment, this will block an
-app from being properly portable. Code to deal with this is due in an upcoming
-version.
+app from being properly portable. Code to deal with this is due in version 2.2.
 
 General handling of registry keys
 =================================
@@ -187,6 +186,9 @@ changing, you should monitor things like the registry, to see what keys you may
 need to deal with. The most popular tool in the PortableApps.com community for
 doing this is Regshot_.
 
-.. _Regshot: http://portableapps.com/apps/utilities/regshot_portable
+.. TODO: check if this is the right link to include; at the time of writing this
+   I didn't have an internet connection.
+
+.. _Regshot: http://sourceforge.net/projects/regshot
 
 *This document is not complete*

@@ -197,8 +197,8 @@ IrfanView_
 * Drive letter updating
 * Full automatic language switching
 
-`Zaz <http://portableapps.com/apps/games/zaz_portable>`_
---------------------------------------------------------
+`Zaz <http://portableapps.com/apps/games/zaz_portable>`
+-------------------------------------------------------
 
 * Working directory
 * Launch app after splash

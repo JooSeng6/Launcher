@@ -26,7 +26,8 @@ are the biggest features which have been done entirely by him (and very
 thoroughly, too). DLL server and type library registration is also a region
 Mark has done a lot of research and work with, but unfortunately it's proved to
 be more complex than we originally thought, and the code is not yet stable
-enough to be included, so it has been removed from 2.1.
+enough to be included, so it has been removed from 2.1.  It may ship in 2.2 or
+2.3, depending on the rapidity of the release cycle.
 
 New features
 ============
@@ -218,5 +219,5 @@ In custom code, the macro ``${ReadUserOverrideConfig}`` has been renamed to
 
 None of these changes are backwards-incompatible insofar as the Generator will
 upgrade the paths and macro name when you first run it. Developers who are
-using the :ref:`development version of the PortableApps.com Launcher <src>` will
+using the :ref:`development version of the PortableApps.com Launcher <hg>` will
 need to :ref:`recompile the Generator <compile-pal-generator>`.
