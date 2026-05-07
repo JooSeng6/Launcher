@@ -1,8 +1,7 @@
 ; CheckForPlatformSplashDisable 1.0 (2010-06-16)
 ;
 ; Checks if the platform wants the splash screen disabled
-; Copyright 2008-2017 John T. Haller of PortableApps.com
-; Copyright 2017 PortableApps.com
+; Copyright 2008-2010 John T. Haller of PortableApps.com
 ; Released under the GPL
 ;
 ; Usage: ${CheckForPlatformSplashDisable} _v
@@ -35,7 +34,7 @@
 		Pop $R0
 		StrCmp $R0 PortableApps.com "" _CFPSDStackEnd
 
-		FindProcDLL::FindProc $R0 PortableAppsPlatform.exe
+		FindProc $R0 PortableAppsPlatform.exe
 		IntCmp $R0 1 "" _CFPSDStackEnd _CFPSDStackEnd
 
 		StrCpy $0 true

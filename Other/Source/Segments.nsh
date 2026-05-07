@@ -7,7 +7,6 @@
  *   Init                        - load data into variables, do startup stuff
  *   Pre(Primary|Secondary)?     - Set up portability
  *   PreExec(Primary|Secondary)? - Just before it gets executed
- *   PostExec(Primary|Secondary)? - Just after it gets executed
  *   Post(Primary|Secondary)?    - Move settings and whatnot back
  *   Unload                      - Unload plug-ins, clean up the launcher itself
  *
@@ -32,9 +31,6 @@
 	${_CreateSegmentDef} PreExec
 	${_CreateSegmentDef} PreExecPrimary
 	${_CreateSegmentDef} PreExecSecondary
-	${_CreateSegmentDef} PostExec
-	${_CreateSegmentDef} PostExecPrimary
-	${_CreateSegmentDef} PostExecSecondary
 	${_CreateSegmentDef} Post
 	${_CreateSegmentDef} PostPrimary
 	${_CreateSegmentDef} PostSecondary
@@ -114,9 +110,6 @@
 	${DisableHook} ${Segment} PreExec
 	${DisableHook} ${Segment} PreExecPrimary
 	${DisableHook} ${Segment} PreExecSecondary
-	${DisableHook} ${Segment} PostExec
-	${DisableHook} ${Segment} PostExecPrimary
-	${DisableHook} ${Segment} PostExecSecondary
 	${DisableHook} ${Segment} Post
 	${DisableHook} ${Segment} PostPrimary
 	${DisableHook} ${Segment} PostSecondary
