@@ -61,6 +61,7 @@ ${!echo} "Including required files..."
 !include NewTextReplace.nsh
 !include TextFunc.nsh
 !include WordFunc.nsh
+!include x64.nsh
 
 ;(NSIS Plugins) {{{2
 !addincludedir Plugins
@@ -111,6 +112,7 @@ Var WaitForProgram
 !macro ReadUserConfig _OUTPUT _VALUE
 	;ReadINIStr ${_OUTPUT} $EXEDIR\$BaseName.ini $BaseName ${_VALUE}
 	${ConfigRead} $EXEDIR\$BaseName.ini ${_VALUE}= ${_OUTPUT}
+	${TrimWhite} `${_OUTPUT}`
 !macroend
 !define ReadUserConfig "!insertmacro ReadUserConfig"
 
@@ -274,7 +276,7 @@ Function Execute           ;{{{1
 	${ReadLauncherConfig} $0 Launch HideCommandLineWindow
 	${If} $0 == true
 		; TODO: do this without a plug-in or at least some way it won't wait with secondary
-		ExecDos::exec $ExecString
+		ExecDos::exec "$ExecString" "" ""
 		Pop $0
 	${Else}
 		${IfNot} ${Errors}
