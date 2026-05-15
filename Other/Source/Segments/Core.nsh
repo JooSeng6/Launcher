@@ -3,54 +3,49 @@ ${SegmentFile}
 Var LauncherFile
 Var Bits
 Var PALBits
+Var CLParameters
 
 ${Segment.onInit}
-	; These may be needed with RunAsAdmin so they can't go in Init.
+		; These may be needed with RunAsAdmin so they can't go in Init.
 
-	${GetBaseName} $EXEFILE $BaseName
-	StrCpy $LauncherFile $EXEDIR\App\AppInfo\Launcher\$BaseName.ini
+		${GetBaseName} $EXEFILE $BaseName
+		StrCpy $LauncherFile $EXEDIR\App\AppInfo\Launcher\$BaseName.ini
 
-	ClearErrors
-	ReadINIStr $AppID $EXEDIR\App\AppInfo\appinfo.ini Details AppID
-	ReadINIStr $AppNamePortable $EXEDIR\App\AppInfo\appinfo.ini Details Name
-	${If} ${Errors}
-		;=== Launcher file missing or missing crucial details
-		StrCpy $AppNamePortable "PortableApps.com Launcher"
-		StrCpy $MissingFileOrPath $EXEDIR\App\AppInfo\appinfo.ini
-		MessageBox MB_OK|MB_ICONSTOP `$(LauncherFileNotFound)`
-		Quit
-	${EndIf}
-
-	${ReadLauncherConfig} $AppName Launch AppName
-	${If} $AppName == ""
-		; Calculate the application name - non-portable version
-		StrCpy $0 $AppNamePortable "" -9
-		${If} $0 == " Portable"
-			StrCpy $AppName $AppNamePortable -9
-		${Else}
-			StrCpy $0 $AppNamePortable "" -18
-			${If} $0 == ", Portable Edition"
-				StrCpy $AppName $AppNamePortable -18
-			${Else}
-				StrCpy $AppName $AppNamePortable
-			${EndIf}
+		ClearErrors
+		ReadINIStr $AppID $EXEDIR\App\AppInfo\appinfo.ini Details AppID
+		ReadINIStr $AppNamePortable $EXEDIR\App\AppInfo\appinfo.ini Details Name
+		${If} ${Errors}
+				;=== Launcher file missing or missing crucial details
+				StrCpy $AppNamePortable "PortableApps.com Launcher"
+				StrCpy $MissingFileOrPath $EXEDIR\App\AppInfo\appinfo.ini
+				MessageBox MB_OK|MB_ICONSTOP `$(LauncherFileNotFound)`
+				Quit
 		${EndIf}
-	${EndIf}
 
-	; Work out if it's 64-bit or 32-bit
-	System::Call kernel32::GetCurrentProcess()i.s
-	System::Call kernel32::IsWow64Process(is,*i.r0)
-	${If} $0 == 0
-		StrCpy $Bits 32
-	${Else}
-		StrCpy $Bits 64
-	${EndIf}
+		${ReadLauncherConfig} $AppName Launch AppName
+		${If} $AppName == ""
+				; Calculate the application name - non-portable version
+				${WordFind} `$AppNamePortable` " Portable" "+01" `$AppName`	
+				StrCpy $1 $AppName -1
+				${If} `$1` == ","
+						StrCpy $AppName `$AppName` "" -1
+				${EndIf}
+		${EndIf}
 
-	${ReadLauncherConfigWithDefault} $PALBits Launch BitsVariable$Bits $Bits
-	${SetEnvironmentVariable} PAL:Bits $PALBits
+		; Work out if it's 64-bit or 32-bit
+		System::Call kernel32::GetCurrentProcess()i.s
+		System::Call kernel32::IsWow64Process(is,*i.r0)
+		${If} $0 == 0
+				StrCpy $Bits 32
+		${Else}
+				StrCpy $Bits 64
+		${EndIf}
 
-	; Make the AppID available in launcher.ini
-	${SetEnvironmentVariable} PAL:AppID $AppID
+		${ReadLauncherConfigWithDefault} $PALBits Launch BitsVariable$Bits $Bits
+		${SetEnvironmentVariable} PAL:Bits $PALBits
+
+		; Make the AppID available in launcher.ini
+		${SetEnvironmentVariable} PAL:AppID $AppID
 !macroend
 
 ${SegmentInit}
@@ -71,32 +66,64 @@ ${SegmentInit}
 		; [Launch]:ProgramExecutableWhenParameters if it exists, falling back to
 		; the normal [Launch]ProgramExecutable if it's not set or if there aren't
 		; arguments.
-		${GetParameters} $0
+		${GetParameters} $CLParameters
 		StrCpy $ProgramExecutable ""
-
-		${If} $Bits = 64
-				${If} $0 != ""
-						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters64
-				${EndIf}
-				${If} $ProgramExecutable == ""
-						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable64
-				${EndIf}
-		${EndIf}
 		
-		${If} $ProgramExecutable != ""
-		${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
-				StrCpy $ProgramExecutable ""
-		${EndIf}
-
-		${If} $0 != ""
-		${AndIf} $ProgramExecutable == ""
-				${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters
-		${EndIf}
-
+		${If} ${IsNativeARM64}
+				${If} `$CLParameters` != ""
+						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParametersARM64
+						${If} `$ProgramExecutable` != ""
+						${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
+								StrCpy $ProgramExecutable ""
+						${EndIf}
+				${EndIf}
+				
+				${If} $ProgramExecutable == ""
+						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableARM64
+						${If} `$ProgramExecutable` != ""
+						${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
+								StrCpy $ProgramExecutable ""
+						${EndIf}
+				${EndIf}
+		${EndIf}		
+				
 		${If} $ProgramExecutable == ""
-				${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable
-		${EndIf}
-
+				${If} ${IsNativeARM64}
+				${AndIf} ${AtLeastW11}
+				${OrIf} ${IsNativeAMD64}
+						${If} `$CLParameters` != ""
+								${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters64
+								${If} `$ProgramExecutable` != ""
+								${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
+										StrCpy $ProgramExecutable ""
+								${EndIf}
+						${EndIf}
+								
+						${If} $ProgramExecutable == ""
+								${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable64
+								${If} `$ProgramExecutable` != ""
+								${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
+										StrCpy $ProgramExecutable ""
+								${EndIf}
+						${EndIf}	
+				${EndIf}
+		${EndIf}			
+								
+		${If} $ProgramExecutable == ""	
+		${OrIf} $Bits = 32
+				${If} `$CLParameters` != ""
+						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutableWhenParameters
+						${If} `$ProgramExecutable` != ""
+						${AndIfNot} ${FileExists} "$EXEDIR\App\$ProgramExecutable"
+								StrCpy $ProgramExecutable ""
+						${EndIf}
+				${EndIf}
+		
+				${If} $ProgramExecutable == ""
+						${ReadLauncherConfig} $ProgramExecutable Launch ProgramExecutable
+				${EndIf}	
+		${EndIf}		
+		
 		${If} $ProgramExecutable == ""
 				; Launcher file missing or missing crucial details (what am I to launch?)
 				MessageBox MB_OK|MB_ICONSTOP `$EXEDIR\App\AppInfo\Launcher\$BaseName.ini is missing [Launch]:ProgramExecutable - what am I to launch?`
